@@ -2,11 +2,13 @@
 
 #include <stdint.h>
 #include "uart.h"
+#include "timer.h"
 
 #define UNUSED(x) (void)(x)
 
 const char hello[] = "\r\nHello World\r\n";
-const char halting[] = "\r\n*** system halting ***";
+
+extern uint32_t waitTime(uint32_t us);
 
 // kernel main function, it all begins here
 void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
@@ -16,10 +18,10 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     
     uart_init();
     
-    uart_puts(hello);
+    uart_puts("*** varkOS ***");
     
-    // Wait a bit
-    for(volatile int i = 0; i < 10000000; ++i) { }
-    
-    uart_puts(halting);
-}
+    while(1){
+        uart_puts(hello);
+        waitUS(1000000);
+    }
+ }
