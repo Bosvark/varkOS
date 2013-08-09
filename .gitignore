@@ -1,0 +1,6 @@
+*.[od]
+*.img
+*~
+.DS_Store
+*.elf
+
