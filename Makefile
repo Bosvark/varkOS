@@ -1,17 +1,25 @@
 # Makefile - build script */
  
 # build environment
-PREFIX ?= /usr/local/cross
-ARMGNU ?= arm-none-eabi
+PREFIX ?= /Users/dieter/yagarto/yagarto-4.7.2/bin
+ARMGNU ?= $(PREFIX)/arm-none-eabi
  
 # source files
 SOURCES_ASM := $(wildcard *.S)
 SOURCES_C   := $(wildcard *.c)
  
 # object files
-OBJS        := $(patsubst %.S,%.o,$(SOURCES_ASM))
-OBJS        += $(patsubst %.c,%.o,$(SOURCES_C))
- 
+#OBJS        := $(patsubst %.S,%.o,$(SOURCES_ASM))
+#OBJS        += $(patsubst %.c,%.o,$(SOURCES_C))
+OBJS=\
+	main.o          \
+	timer.o         \
+	uart.o          \
+	mailbox.o       \
+	framebuffer.o   \
+    string.o        \
+    klog.o
+     
 # Build flags
 DEPENDFLAGS := -MD -MP
 INCLUDES    := -I include
@@ -28,13 +36,14 @@ WARNFLAGS   += -Wmissing-include-dirs -Wno-multichar
 WARNFLAGS   += -Wredundant-decls -Wshadow
 WARNFLAGS   += -Wno-sign-compare -Wswitch -Wsystem-headers -Wundef
 WARNFLAGS   += -Wno-pragmas -Wno-unused-but-set-parameter
-WARNFLAGS   += -Wno-unused-but-set-variable -Wno-unused-result
+#WARNFLAGS   += -Wno-unused-but-set-variable -Wno-unused-result
 WARNFLAGS   += -Wwrite-strings -Wdisabled-optimization -Wpointer-arith
 WARNFLAGS   += -Werror
 ASFLAGS     := $(INCLUDES) $(DEPENDFLAGS) -D__ASSEMBLY__
 CFLAGS      := $(INCLUDES) $(DEPENDFLAGS) $(BASEFLAGS) $(WARNFLAGS)
 CFLAGS      += -std=c99
- 
+#CFLAGS= $(INCLUDES) -Wall -O2 -nostdlib -nostartfiles -ffreestanding
+
 # build rules
 all: kernel.img
  
@@ -48,8 +57,6 @@ kernel.img: kernel.elf
  
 clean:
 	$(RM) -f $(OBJS) kernel.elf kernel.img
- 
-dist-clean: clean
 	$(RM) -f *.d
  
 # C.
@@ -59,3 +66,4 @@ dist-clean: clean
 # AS.
 %.o: %.S Makefile
 	$(ARMGNU)-gcc $(ASFLAGS) -c $< -o $@
+    
