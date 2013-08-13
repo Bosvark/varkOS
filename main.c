@@ -7,6 +7,7 @@
 //#include "framebuffer.h"
 #include "string.h"
 #include "klog.h"
+#include "gpio.h"
 
 #define UNUSED(x) (void)(x)
 
@@ -38,6 +39,8 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     
     uart_init();
     
+    gpioSetOutput(PIN_LED_OK);
+
     uart_puts("\r\n*** varkOS ***\r\n");
 
 //    FramebufferInit(&fb_info);
@@ -46,10 +49,16 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
 
     while(1)
     {
+    	gpioToggle(PIN_LED_OK);
+//    	gpioWrite(PIN_LED_OK, 1);
+
         klogInt("klogInt:", intval);
-        waitUS(TIMER_ONE_SECOND);
+        waitUS(TIMER_HALF_SECOND);
+
+        gpioToggle(PIN_LED_OK);
+//        gpioWrite(PIN_LED_OK, 0);
 
         klogBin("klogBin:", (unsigned char*)"\x12\x34\x56\x78", 4);
-        waitUS(TIMER_ONE_SECOND);
+        waitUS(TIMER_HALF_SECOND);
     }
  }
