@@ -1,6 +1,7 @@
 /* main.c - the entry point for the kernel */
 
 #include <stdint.h>
+#include <stdint.h>
 #include "uart.h"
 #include "timer.h"
 //#include "framebuffer.h"
@@ -30,7 +31,7 @@ void fb_test(void)
 
 // kernel main function, it all begins here
 void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
-//    uint32_t count=12345;
+	unsigned int intval=0x31323334;
     UNUSED(r0);
     UNUSED(r1);
     UNUSED(atags);
@@ -45,12 +46,10 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
 
     while(1)
     {
-        unsigned int intval=0x31323334;
-        klogInt("number 1:", intval);
+        klogInt("klogInt:", intval);
         waitUS(TIMER_ONE_SECOND);
-/*
-        klogInt("Counter:", count++);
+
+        klogBin("klogBin:", (unsigned char*)"\x12\x34\x56\x78", 4);
         waitUS(TIMER_ONE_SECOND);
-*/
     }
  }
