@@ -30,7 +30,7 @@ void fb_test(void)
 
 // kernel main function, it all begins here
 void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
-    uint32_t count=12345;
+//    uint32_t count=12345;
     UNUSED(r0);
     UNUSED(r1);
     UNUSED(atags);
@@ -48,8 +48,9 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
         unsigned int intval=0x31323334;
         klogInt("number 1:", intval);
         waitUS(TIMER_ONE_SECOND);
-
+/*
         klogInt("Counter:", count++);
         waitUS(TIMER_ONE_SECOND);
+*/
     }
  }
