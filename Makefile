@@ -18,7 +18,8 @@ OBJS=\
 	mailbox.o       \
 	framebuffer.o   \
     string.o        \
-    klog.o
+    klog.o			\
+    gpio.o
      
 # Build flags
 DEPENDFLAGS := -MD -MP
