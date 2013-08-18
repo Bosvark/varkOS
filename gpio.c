@@ -85,6 +85,26 @@ void gpioWrite(int pinno, int level)
 	}
 }
 
+void gpioWriteSafe(int pinno, int level)
+{
+	int regval;
+
+	if(pinno >= 32){
+		pinno = pinno - 32;
+		regval = mmio_read(GPLEV1);
+	}else{
+		regval = mmio_read(GPLEV0);
+	}
+
+	regval |= (1 << pinno);
+
+	if(pinno >= 32){
+		mmio_write(level ? GPSET1 : GPCLR1, regval);
+	}else{
+		mmio_write(level ? GPSET0 : GPCLR0, regval);
+	}
+}
+
 //
 // Local functions
 //

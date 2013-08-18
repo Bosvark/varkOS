@@ -8,5 +8,5 @@ void gpioSetOutput(int no);
 void gpioToggle(int pinno);
 int gpioRead(int pinno);
 void gpioWrite(int pinno, int level);	// level = 1 : High - level = 0 : Low
-
+void gpioWriteSafe(int pinno, int level);	// Read, modify, write
 #endif // _GPIO_H_
