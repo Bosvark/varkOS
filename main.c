@@ -30,9 +30,42 @@ void fb_test(void)
 }
 */
 
+void ptr_test(unsigned char *input, unsigned char *output, unsigned int length)
+{
+	while(length--)
+		*output++ = *input++;
+}
+/*
+void ptr_test(unsigned char *input, unsigned char *output, unsigned int length)
+{
+	int pos=0;
+	do{
+		output[pos] = input[pos];
+		pos++;
+	}while(pos < length);
+}
+
+void ptr_test(unsigned char *input, unsigned char *output, unsigned int length)
+{
+	memcpy(output, input, length);
+}
+*/
+void run_test(void)
+{
+	int val1=0x12345678,val2=0;
+
+	ptr_test((unsigned char*)&val1,(unsigned char*)&val2, sizeof(val1));
+
+	if(val1 == val2){
+		gpioWrite(PIN_LED_OK, 0);
+	}
+
+	while(1); waitUS(TIMER_HALF_SECOND);
+}
 // kernel main function, it all begins here
 void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
-	unsigned int intval=0x31323334;
+//	unsigned int intval=0x31323334;
+
     UNUSED(r0);
     UNUSED(r1);
     UNUSED(atags);
@@ -40,6 +73,8 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     uart_init();
     
     gpioSetOutput(PIN_LED_OK);
+
+    run_test();
 
     uart_puts("\r\n*** varkOS ***\r\n");
 
@@ -49,16 +84,16 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
 
     while(1)
     {
-    	gpioToggle(PIN_LED_OK);
-//    	gpioWrite(PIN_LED_OK, 1);
+//    	gpioToggle(PIN_LED_OK);
+//    	gpioWriteSafe(PIN_LED_OK, 0);
 
-        klogInt("klogInt:", intval);
-        waitUS(TIMER_HALF_SECOND);
+//        klogInt("klogInt:", intval);
+//        waitUS(TIMER_HALF_SECOND);
 
-        gpioToggle(PIN_LED_OK);
-//        gpioWrite(PIN_LED_OK, 0);
+//        gpioToggle(PIN_LED_OK);
+//       gpioWrite(PIN_LED_OK, 1);
 
-        klogBin("klogBin:", (unsigned char*)"\x12\x34\x56\x78", 4);
-        waitUS(TIMER_HALF_SECOND);
+//        klogBin("klogBin:", (unsigned char*)"\x12\x34\x56\x78", 4);
+//        waitUS(TIMER_HALF_SECOND);
     }
  }
