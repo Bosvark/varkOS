@@ -27,7 +27,8 @@ INCLUDES    := -I include
 BASEFLAGS   := -O2 -fpic -pedantic -pedantic-errors -nostdlib
 BASEFLAGS   += -nostartfiles -ffreestanding -nodefaultlibs
 BASEFLAGS   += -fno-builtin -fomit-frame-pointer -mcpu=arm1176jzf-s
-WARNFLAGS   := -Wall -Wextra -Wshadow -Wcast-align -Wwrite-strings
+#BASEFLAGS   += -g
+WARNFLAGS   := -W -Wall -Wextra -Wshadow -Wcast-align -Wwrite-strings
 WARNFLAGS   += -Wredundant-decls -Winline
 WARNFLAGS   += -Wno-attributes -Wno-deprecated-declarations
 WARNFLAGS   += -Wno-div-by-zero -Wno-endif-labels -Wfloat-equal
