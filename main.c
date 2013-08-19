@@ -29,20 +29,16 @@ void fb_test(void)
     }
 }
 */
-
-void ptr_test(unsigned char *input, unsigned char *output, unsigned int length)
-{
-	while(length--)
-		*output++ = *input++;
-}
 /*
 void ptr_test(unsigned char *input, unsigned char *output, unsigned int length)
 {
 	int pos=0;
+	(void)length;
 	do{
 		output[pos] = input[pos];
-		pos++;
-	}while(pos < length);
+		pos = pos + 1;
+		uart_puts(".");
+	}while(pos < 4);
 }
 
 void ptr_test(unsigned char *input, unsigned char *output, unsigned int length)
@@ -50,6 +46,15 @@ void ptr_test(unsigned char *input, unsigned char *output, unsigned int length)
 	memcpy(output, input, length);
 }
 */
+void ptr_test(unsigned char *input, unsigned char *output, unsigned int length)
+{
+	while(length--){
+		*output++ = *input++;
+		uart_putc('.');
+	}
+}
+
+
 void run_test(void)
 {
 	int val1=0x12345678,val2=0;
@@ -58,42 +63,40 @@ void run_test(void)
 
 	if(val1 == val2){
 		gpioWrite(PIN_LED_OK, 0);
-	}
-
-	while(1); waitUS(TIMER_HALF_SECOND);
+		uart_puts("equal\r\n");
+	}else
+		uart_puts("not equal\r\n");
 }
+
 // kernel main function, it all begins here
 void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
-//	unsigned int intval=0x31323334;
-
     UNUSED(r0);
     UNUSED(r1);
     UNUSED(atags);
     
     uart_init();
-    
-    gpioSetOutput(PIN_LED_OK);
-
-    run_test();
-
     uart_puts("\r\n*** varkOS ***\r\n");
 
 //    FramebufferInit(&fb_info);
     
 //    fb_test();
 
+    gpioSetOutput(PIN_LED_OK);
+
+    run_test();
+
     while(1)
     {
 //    	gpioToggle(PIN_LED_OK);
-//    	gpioWriteSafe(PIN_LED_OK, 0);
+    	gpioWriteSafe(PIN_LED_OK, 0);
 
 //        klogInt("klogInt:", intval);
-//        waitUS(TIMER_HALF_SECOND);
+        waitUS(TIMER_HALF_SECOND);
 
 //        gpioToggle(PIN_LED_OK);
-//       gpioWrite(PIN_LED_OK, 1);
+       gpioWrite(PIN_LED_OK, 1);
 
 //        klogBin("klogBin:", (unsigned char*)"\x12\x34\x56\x78", 4);
-//        waitUS(TIMER_HALF_SECOND);
+        waitUS(TIMER_HALF_SECOND);
     }
  }
