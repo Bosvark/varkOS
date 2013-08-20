@@ -12,6 +12,7 @@ SOURCES_C   := $(wildcard *.c)
 #OBJS        := $(patsubst %.S,%.o,$(SOURCES_ASM))
 #OBJS        += $(patsubst %.c,%.o,$(SOURCES_C))
 OBJS=\
+	boot.o			\
 	main.o          \
 	timer.o         \
 	uart.o          \
@@ -66,6 +67,6 @@ clean:
 	$(ARMGNU)-gcc $(CFLAGS) -c $< -o $@
  
 # AS.
-%.o: %.S Makefile
+%.o: %.s Makefile
 	$(ARMGNU)-gcc $(ASFLAGS) -c $< -o $@
     
