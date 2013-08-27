@@ -27,7 +27,7 @@ void MailboxWrite(uint32_t message, uint32_t mailbox)
     }while(status & 0x80000000);             // Check that the top bit is set
     
     data_mem_barrier();
-    mmio_write(MAILBOX_WRITE, (message << 4) | mailbox);   // Combine message and mailbox channel and write to the mailbox
+    mmio_write(MAILBOX_WRITE, message | mailbox);   // Combine message and mailbox channel and write to the mailbox
 }
 
 uint32_t MailboxRead(uint32_t mailbox)
