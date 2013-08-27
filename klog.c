@@ -33,6 +33,12 @@ void klogBin(const char *description, unsigned char *bindata, unsigned int binle
     uart_puts("]\r\n");
 }
 
+void klogStr(const char *description)
+{
+    uart_puts(description);
+    uart_puts("\r\n");
+}
+
 //
 // Local functions
 //
