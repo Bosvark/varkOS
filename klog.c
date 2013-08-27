@@ -7,6 +7,7 @@ void hex_2_ascii(unsigned char *hex, char *ascii, unsigned int hex_len);
 
 void klogInt(const char *description, unsigned int intval)
 {
+/*
     char buffer[20];
 
     memset(buffer, 0, sizeof(buffer));
@@ -16,6 +17,10 @@ void klogInt(const char *description, unsigned int intval)
     uart_puts(description);
     uart_puts("0x");
     uart_puts(buffer);
+    uart_puts("\r\n");
+ */
+    uart_puts(description);
+    uart_puts(itoa((int)intval));
     uart_puts("\r\n");
 }
 
