@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <mmio.h>
 #include <mailbox.h>
+#include <barrier.h>
 
 enum {
     MAILBOX_BASE            = 0x2000B880,
@@ -20,9 +21,12 @@ void MailboxWrite(uint32_t message, uint32_t mailbox)
     
     // Wait for the mailbox to become available
     do{
+    	data_mem_barrier();
         status = mmio_read(MAILBOX_STATUS);
+        data_mem_barrier();
     }while(status & 0x80000000);             // Check that the top bit is set
     
+    data_mem_barrier();
     mmio_write(MAILBOX_WRITE, (message << 4) | mailbox);   // Combine message and mailbox channel and write to the mailbox
 }
 
@@ -36,10 +40,14 @@ uint32_t MailboxRead(uint32_t mailbox)
     while(1){
 		// Wait for the mailbox to become available
 		do{
+			data_mem_barrier();
 			status = mmio_read(MAILBOX_STATUS);
+			data_mem_barrier();
 		}while(status & 0x40000000);             // Check that the 30th bit is set
 
+		data_mem_barrier();
 		status = mmio_read(MAILBOX_BASE);
+		data_mem_barrier();
 
 		if(mailbox == (status & 0x0000000f))
 			return status & 0x0000000f;
