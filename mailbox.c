@@ -15,9 +15,6 @@ void MailboxWrite(uint32_t message, uint32_t mailbox)
 {
     uint32_t status;
     
-    if((message & 0x0f) != 0)   // Check that the lower 4 bitys are all 0
-        return;
-    
     if(mailbox > 15)            // Not sure why thisis neccesary - find out!
         return;
     
@@ -26,8 +23,7 @@ void MailboxWrite(uint32_t message, uint32_t mailbox)
         status = mmio_read(MAILBOX_STATUS);
     }while(status & 0x80000000);             // Check that the top bit is set
     
-    
-    mmio_write(MAILBOX_WRITE, (message << 4) | mailbox);   // Combine messahe and mailbox channel and write to the mailbox
+    mmio_write(MAILBOX_WRITE, (message << 4) | mailbox);   // Combine message and mailbox channel and write to the mailbox
 }
 
 uint32_t MailboxRead(uint32_t mailbox)
@@ -37,10 +33,15 @@ uint32_t MailboxRead(uint32_t mailbox)
     if(mailbox > 15)            // Not sure why thisis neccesary - find out!
         return 0;
 
-    // Wait for the mailbox to become available
-    do{
-        status = mmio_read(MAILBOX_STATUS);
-    }while(status & 0x40000000);             // Check that the 30th bit is set
-    
-    return mmio_read(MAILBOX_BASE);
+    while(1){
+		// Wait for the mailbox to become available
+		do{
+			status = mmio_read(MAILBOX_STATUS);
+		}while(status & 0x40000000);             // Check that the 30th bit is set
+
+		status = mmio_read(MAILBOX_BASE);
+
+		if(mailbox == (status & 0x0000000f))
+			return status & 0x0000000f;
+    }
 }
