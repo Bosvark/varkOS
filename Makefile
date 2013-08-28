@@ -12,6 +12,7 @@ SOURCES_C   := $(wildcard *.c)
 #OBJS        := $(patsubst %.S,%.o,$(SOURCES_ASM))
 #OBJS        += $(patsubst %.c,%.o,$(SOURCES_C))
 OBJS=\
+	font_mono_8x16.o\
 	boot.o			\
 	main.o          \
 	timer.o         \
@@ -21,7 +22,9 @@ OBJS=\
     string.o        \
     klog.o			\
     gpio.o
-     
+    
+FONTS_DIR=fonts
+	     
 # Build flags
 DEPENDFLAGS := -MD -MP
 INCLUDES    := -I include
@@ -54,7 +57,7 @@ include $(wildcard *.d)
  
 kernel.elf: $(OBJS) link-arm-eabi.ld
 	$(ARMGNU)-ld $(OBJS) -Tlink-arm-eabi.ld -o $@
- 
+
 kernel.img: kernel.elf
 	$(ARMGNU)-objcopy kernel.elf -O binary kernel.img
  
@@ -69,4 +72,7 @@ clean:
 # AS.
 %.o: %.s Makefile
 	$(ARMGNU)-gcc $(ASFLAGS) -c $< -o $@
-    
+	
+%.o: $(FONTS_DIR)/%.bin
+	$(ARMGNU)-objcopy -I binary -O elf32-littlearm -B arm $< $@
+
