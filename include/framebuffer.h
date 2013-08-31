@@ -15,5 +15,7 @@ typedef struct __attribute__ ((aligned (16))){
 }FramebufferInfo;
 
 uint32_t FramebufferInit(FramebufferInfo *fb_info);
+void console_write(const char *msg);
 
 #endif // _FRAMEBUFFER_H_
+
