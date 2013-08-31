@@ -34,7 +34,7 @@ void put_pixel_RGB24(uint32_t x, uint32_t y, uint8_t red, uint8_t green, uint8_t
 void disp_char(int8_t cval);
 void display_logo(void);
 
-uint32_t FramebufferInit(FramebufferInfo *fb_info)
+uint32_t FramebufferInit(void)
 {
     uint32_t retval=0;
     volatile unsigned int mb[100] __attribute__ ((aligned(16)));
