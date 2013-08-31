@@ -1,8 +1,10 @@
 #include "klog.h"
 #include "uart.h"
 #include "string.h"
+#include "framebuffer.h"
 #include "timer.h"
 
+void output(const char *msg);
 void hex_2_ascii(unsigned char *hex, char *ascii, unsigned int hex_len);
 
 void klogInt(const char *description, unsigned int intval)
@@ -19,9 +21,9 @@ void klogInt(const char *description, unsigned int intval)
     uart_puts(buffer);
     uart_puts("\r\n");
  */
-    uart_puts(description);
-    uart_puts(itoa((int)intval));
-    uart_puts("\r\n");
+	output(description);
+    output(itoa((int)intval));
+    output("\r\n");
 }
 
 void klogBin(const char *description, unsigned char *bindata, unsigned int binlen)
@@ -32,29 +34,37 @@ void klogBin(const char *description, unsigned char *bindata, unsigned int binle
 
     hex_2_ascii(bindata, buffer, binlen);
 
-    uart_puts(description);
-    uart_puts("[");
-    uart_puts(buffer);
-    uart_puts("]\r\n");
+    output(description);
+    output("[");
+    output(buffer);
+    output("]\r\n");
 }
 
 void klogStr(const char *description)
 {
-    uart_puts(description);
-    uart_puts("\r\n");
+	output(description);
+    output("\r\n");
 }
 
 //
 // Local functions
 //
+void output(const char *msg)
+{
+	console_write(msg);
+	uart_puts(msg);
+}
 
 static const char *ascii_def={"0123456789ABCDEF"};
 
 void hex_2_ascii(unsigned char *hex, char *ascii, unsigned int hex_len)
 {
-	while(hex_len--){
-        *ascii++ = *(ascii_def + ((hex[hex_len] >> 4) & 0x0f));
-        *ascii++ = *(ascii_def + (hex[hex_len] & 0x0f));
+	unsigned int pos=0;
+
+	while(pos < hex_len){
+        *ascii++ = *(ascii_def + ((hex[pos] >> 4) & 0x0f));
+        *ascii++ = *(ascii_def + (hex[pos] & 0x0f));
+        pos++;
     }
 }
 
