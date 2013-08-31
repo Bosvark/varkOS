@@ -12,6 +12,7 @@ SOURCES_C   := $(wildcard *.c)
 #OBJS        := $(patsubst %.S,%.o,$(SOURCES_ASM))
 #OBJS        += $(patsubst %.c,%.o,$(SOURCES_C))
 OBJS=\
+	Logo_24b_260x194.o\
 	font_mono_8x16.o\
 	boot.o			\
 	main.o          \
@@ -24,6 +25,7 @@ OBJS=\
     gpio.o
     
 FONTS_DIR=fonts
+ICONS_DIR=icons
 	     
 # Build flags
 DEPENDFLAGS := -MD -MP
@@ -31,7 +33,6 @@ INCLUDES    := -I include
 BASEFLAGS   := -O2 -fpic -pedantic -pedantic-errors -nostdlib
 BASEFLAGS   += -nostartfiles -ffreestanding -nodefaultlibs
 BASEFLAGS   += -fno-builtin -fomit-frame-pointer -mcpu=arm1176jzf-s
-#BASEFLAGS   += -g
 WARNFLAGS   := -W -Wall -Wextra -Wshadow -Wcast-align -Wwrite-strings
 WARNFLAGS   += -Wredundant-decls -Winline
 WARNFLAGS   += -Wno-attributes -Wno-deprecated-declarations
@@ -42,13 +43,11 @@ WARNFLAGS   += -Wmissing-include-dirs -Wno-multichar
 WARNFLAGS   += -Wredundant-decls -Wshadow
 WARNFLAGS   += -Wno-sign-compare -Wswitch -Wsystem-headers -Wundef
 WARNFLAGS   += -Wno-pragmas -Wno-unused-but-set-parameter
-#WARNFLAGS   += -Wno-unused-but-set-variable -Wno-unused-result
 WARNFLAGS   += -Wwrite-strings -Wdisabled-optimization -Wpointer-arith
 WARNFLAGS   += -Werror
 ASFLAGS     := $(INCLUDES) $(DEPENDFLAGS) -D__ASSEMBLY__
 CFLAGS      := $(INCLUDES) $(DEPENDFLAGS) $(BASEFLAGS) $(WARNFLAGS)
 CFLAGS      += -std=c99
-#CFLAGS= $(INCLUDES) -Wall -O2 -nostdlib -nostartfiles -ffreestanding
 
 # build rules
 all: kernel.img
@@ -74,5 +73,8 @@ clean:
 	$(ARMGNU)-gcc $(ASFLAGS) -c $< -o $@
 	
 %.o: $(FONTS_DIR)/%.bin
+	$(ARMGNU)-objcopy -I binary -O elf32-littlearm -B arm $< $@
+	
+%.o: $(ICONS_DIR)/%.bin
 	$(ARMGNU)-objcopy -I binary -O elf32-littlearm -B arm $< $@
 
