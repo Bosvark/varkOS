@@ -38,7 +38,6 @@ uint32_t FramebufferInit(void)
 {
     uint32_t retval=0;
     volatile unsigned int mb[100] __attribute__ ((aligned(16)));
-(void)fb_info;
 
 	depth = 24;
 
