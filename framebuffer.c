@@ -41,48 +41,6 @@ uint32_t FramebufferInit(void)
 
 	depth = 24;
 
-/*
-    MailboxWrite((uint32_t)(fb_info+0x40000000), 1);
-
-	if((retval = MailboxRead(1)) == 0){
-		klogStr("Read FramebufferInfo failed");
-		return 0;
-	}
-
-//	klogBin("FramebufferInfo - Response:", (uint8_t*)fb_info, sizeof(FramebufferInfo));
-	klogInt("FramebufferInfo.physical_width :", fb_info->physical_width);
-	klogInt("FramebufferInfo.physical_height:", fb_info->physical_height);
-	klogInt("FramebufferInfo.virt_width     :", fb_info->virt_width);
-	klogInt("FramebufferInfo.virt_height    :", fb_info->virt_height);
-	klogInt("FramebufferInfo.size           :", fb_info->size);
-	klogInt("FramebufferInfo.depth          :", fb_info->depth);
-	klogInt("FramebufferInfo.pitch          :", fb_info->pitch);
-	klogInt("FramebufferInfo.x              :", fb_info->x);
-	klogInt("FramebufferInfo.y              :", fb_info->y);
-	klogBin("FramebufferInfo.gpu_ptr        :", (uint8_t*)fb_info->gpu_ptr, 4);
-*/
-//	klogBin("Font0 start:",(uint8_t*)&_binary_fonts_font_mono_8x16_bin_start, _binary_fonts_font_mono_8x16_bin_size);
-    /*
-     * Buffer contents:
-		u32: buffer size in bytes (including the header values, the end tag and padding)
-		u32: buffer request/response code
-				Request codes:
-					0x00000000: process request
-				All other values reserved
-				Response codes:
-					0x80000000: request successful
-					0x80000001: error parsing request buffer (partial response)
-				All other values reserved
-		u8...: sequence of concatenated tags
-		u32: 0x0 (end tag)
-		u8...: padding
-
-		Tag format:
-		u32: tag identifier
-		u32: value buffer size in bytes
-		u32: 1 bit (MSB) request/response indicator (0=request, 1=response), 31 bits (LSB) value length in bytes
-		u8...: value buffer
-*/
 	//
 	// Get physical size
 	//
@@ -205,55 +163,6 @@ uint32_t FramebufferInit(void)
 
 	fb_x--;
 	fb_y--;
-/*
-	put_pixel_RGB565(1, 1, 0xf800);				// Top left
-	put_pixel_RGB565(fb_x, 1, 0xf800);			// Top right
-	put_pixel_RGB565(1, fb_y, 0xf800);			// Bottom left
-	put_pixel_RGB565(fb_x, fb_y, 0xf800);		// Bottom right
-	put_pixel_RGB565(fb_x/2, fb_y/2, 0xf800);	// Centre
-*/
-
-/* Frame
-	for(uint32_t j=0;j<16; j++){
-		for(uint32_t i=0;i<fb_y; i++){
-			switch(depth)
-			{
-				case 16:put_pixel_RGB565(j, i, 0xf800);break;
-				case 24:put_pixel_RGB24(j, i, 0, 0xff, 0);break;
-			}
-		}
-	}
-
-	for(uint32_t j=0;j<16; j++){
-		for(uint32_t i=0;i<fb_x; i++){
-			switch(depth)
-			{
-				case 16:put_pixel_RGB565(i, j, 0xf800);break;
-				case 24:put_pixel_RGB24(i, j, 0, 0xff, 0);break;
-			}
-		}
-	}
-
-	for(uint32_t j=fb_y-16;j<fb_y; j++){
-		for(uint32_t i=fb_x;i; i--){
-			switch(depth)
-			{
-				case 16:put_pixel_RGB565(i, j, 0xf800);break;
-				case 24:put_pixel_RGB24(i, j, 0, 0xff, 0);break;
-			}
-		}
-	}
-
-	for(uint32_t j=fb_x-16;j<fb_x; j++){
-		for(uint32_t i=0;i<fb_y; i++){
-			switch(depth)
-			{
-				case 16:put_pixel_RGB565(j, i, 0xf800);break;
-				case 24:put_pixel_RGB24(j, i, 0, 0xff, 0);break;
-			}
-		}
-	}
-*/
 
 	display_logo();
 
@@ -264,6 +173,24 @@ uint32_t FramebufferInit(void)
 	return 1;
 }
 
+void console_write(const char *msg)
+{
+	if(console_init == 0)
+		return;
+
+	for(;*msg;msg++){
+		if(*msg == '\r')
+			cons_x = 1;
+		else if(*msg == '\n')
+			cons_y+=FNT_HEIGHT;
+		else
+			disp_char(*msg);
+	}
+}
+
+//
+// Local functions
+//
 /*
  * Notes on color formats:
  *
@@ -276,16 +203,6 @@ uint32_t FramebufferInit(void)
  * RGBA32 (16 777 216 colors with 256 levels of transparency) - 32 bits per pixel: 1st 8 bits (LSB) red intensity, 2nd 8 bits green intensity,
  *                                                              3rd 8 bits blue intensity, 4th 8 bits (MSB) transparency level
  */
-void put_pixel_RGB565(uint32_t x, uint32_t y, uint16_t color)
-{
-	volatile uint32_t *ptr=0;
-	uint32_t offset=0;
-
-	offset = (y * pitch) + (x*2);
-	ptr = (uint32_t*)(fb_address + offset);
-	*ptr = (uint32_t)color;
-}
-
 void put_pixel_RGB24(uint32_t x, uint32_t y, uint8_t red, uint8_t green, uint8_t blue)
 {
 	volatile uint32_t *ptr=0;
@@ -298,7 +215,7 @@ void put_pixel_RGB24(uint32_t x, uint32_t y, uint8_t red, uint8_t green, uint8_t
 	*((uint8_t*)(ptr+2)) = blue;
 }
 
-void disp_char(int8_t cval)
+void disp_char_RGB24(int8_t cval)
 {
 	uint8_t *ptr=&_binary_fonts_font_mono_8x16_bin_start;
 	uint32_t font_offset=cval*16,row=0,col=0;
@@ -326,18 +243,45 @@ void disp_char(int8_t cval)
 	cons_x += FNT_WIDTH;
 }
 
-void console_write(const char *msg)
+void put_pixel_RGB565(uint32_t x, uint32_t y, uint16_t color)
 {
-	if(console_init == 0)
-		return;
+	volatile uint32_t *ptr=0;
+	uint32_t offset=0;
 
-	for(;*msg;msg++){
-		if(*msg == '\r')
-			cons_x = 1;
-		else if(*msg == '\n')
-			cons_y+=FNT_HEIGHT;
-		else
-			disp_char(*msg);
+	offset = (y * pitch) + (x*2);
+	ptr = (uint32_t*)(fb_address + offset);
+	*ptr = (uint32_t)color;
+}
+
+void disp_char_RGB565(int8_t cval)
+{
+	uint8_t *ptr=&_binary_fonts_font_mono_8x16_bin_start;
+	uint32_t font_offset=cval*16,row=0,col=0;
+	uint16_t color;
+	uint32_t x,y;
+
+	for(y=cons_y;y<cons_y+FNT_HEIGHT;y++){
+		col=0;
+		for(x=cons_x;x<cons_x+FNT_WIDTH;x++){
+			if(*(ptr+font_offset+row)&(1<<col++))
+				color = 0xffff;
+			else
+				color = 0;
+
+			put_pixel_RGB565(x, y, color);
+		}
+		row++;
+	}
+
+	cons_x += FNT_WIDTH;
+}
+
+void disp_char(int8_t cval)
+{
+	switch(depth)
+	{
+		case 16: disp_char_RGB565(cval); break;
+		case 24: disp_char_RGB24(cval); break;
 	}
 }
 
@@ -352,7 +296,22 @@ void display_logo(void)
 			r=*ptr++;
 			g=*ptr++;
 			b=*ptr++;
-			put_pixel_RGB24(x, y, r, g, b);
+
+			switch(depth)
+			{
+				case 16:
+				{
+					uint16_t color=0;
+					color = (uint16_t)((r & 0x1f) << 11);
+					color |= (uint16_t)((g & 0x3f) << 5);
+					color |= (uint16_t)(b & 0x1f);
+					put_pixel_RGB565(x, y, color);
+				}
+					break;
+				case 24:
+					put_pixel_RGB24(x, y, r, g, b);
+					break;
+			}
 		}
 	}
 }
