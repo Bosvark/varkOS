@@ -59,6 +59,15 @@ static const char *ascii_def={"0123456789ABCDEF"};
 
 void hex_2_ascii(unsigned char *hex, char *ascii, unsigned int hex_len)
 {
+	while(hex_len--){
+        *ascii++ = *(ascii_def + ((hex[hex_len] >> 4) & 0x0f));
+        *ascii++ = *(ascii_def + (hex[hex_len] & 0x0f));
+    }
+}
+
+/*
+void hex_2_ascii(unsigned char *hex, char *ascii, unsigned int hex_len)
+{
 	unsigned int pos=0;
 
 	while(pos < hex_len){
@@ -67,4 +76,4 @@ void hex_2_ascii(unsigned char *hex, char *ascii, unsigned int hex_len)
         pos++;
     }
 }
-
+*/
